@@ -1,0 +1,3 @@
+[submodule "Segment"]
+	path = Segment
+	url = https://github.com/adityakarad17/SegmentTree
