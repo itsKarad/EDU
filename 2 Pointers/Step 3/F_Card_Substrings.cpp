@@ -71,7 +71,7 @@ void solve()
 signed main() 
 { 
     FAST;
-    solve();
+    solve2();
     return 0; 
 } 
 

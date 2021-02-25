@@ -36,6 +36,7 @@ vector<int> p(200005,-1);
 vector<int> sz(200005,0);
 int get(int a){
     if(p[a]!=a){
+        //path compression
         p[a]=get(p[a]);
     }
     return p[a];
@@ -43,6 +44,9 @@ int get(int a){
 void unify(int a,int b){
     a=get(a);
     b=get(b);
+    if(a==b){
+        return;// not added before, exit case
+    }
     if(sz[a]<sz[b]){
         swap(a,b);
     }

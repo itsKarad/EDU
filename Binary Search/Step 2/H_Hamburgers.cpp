@@ -12,7 +12,6 @@
 #define INF 1e18 
 #define ve vector
 #define mp make_pair
-#define pb push_back
 #define pf push_front
 #define ppb pop_back
 #define ppf pop_front
@@ -31,98 +30,60 @@ using namespace std;
 //===================================================================================================================
 // THE FIRST PRINCIPLE, IS THAT YOU MUST NOT FOOL YOURSELF, AND YOU ARE THE EASIEST PERSON TO FOOL- Richard Feynman.
 // ******************************************************************************************************************
-vector<set<int>> adj(50003);
-vector<int> p(200005,-1);
-vector<int> sz(200005,0);
-int get(int a){
-    if(p[a]!=a){
-        // path compression
-        p[a]=get(p[a]);
-    }
-    
-    return p[a];
-}
-void unify(int a,int b){
-    a=get(a);
-    b=get(b);
-    if(a==b){
-        return;
-    }
-    if(sz[a]<sz[b]){
-        swap(a,b);
-    }
-    p[b]=a;
-    sz[a]+=sz[b];
-}
+int nb,ns,nc,pb,ps,pc,r;
+int reqb=0,reqs=0,reqc=0;
+int already=0;
+string s;
+bool valid(int x){// can we make x 
+    int cost=0;
 
+    cost+=max(0ll,(x*reqb-nb)*pb);
+    cost+=max(0ll,(x*reqs-ns)*ps);
+    cost+=max(0ll,(x*reqc-nc)*pc);
+    return (cost<=r);
+}
 void solve()
 {
-    int n,m,k;
-    cin>>n>>m>>k;
-    for(int i=0;i<m;i++){
-        int x,y;
-        cin>>x>>y;
-        // connect these two
-        adj[x].insert(y);
-        adj[y].insert(x);
-    }
-    vector<int> answer;
-    vector<pair<int,pair<int,int>>> queries;
-    for(int i=0;i<k;i++){
-        string s;
-        cin>>s;
-        int x,y;
-        cin>>x>>y;
-        if(s=="ask"){
-            queries.pb({1,{x,y}});
+    cin>>s;  
+    cin>>nb>>ns>>nc;
+    cin>>pb>>ps>>pc;
+    cin>>r;
+    reqb=0,reqc=0,reqs=0;
+    for(int i=0;i<s.length();i++){
+        if(s[i]=='B'){
+            reqb++;
+        }
+        else if(s[i]=='S'){
+            reqs++;
         }
         else{
-            adj[x].erase(y);
-            adj[y].erase(x);
-            queries.pb({-1,{x,y}});
+            reqc++;
         }
-    }
-    reverse(all(queries));
-    for(int i=1;i<=n;i++){
-        p[i]=i;
-        sz[i]=1;
-    }
-    for(int i=1;i<=n;i++){
-        for(auto j : adj[i]){
-            unify(i,j);
+    }  
+    for(int burger=0;burger<=100;burger++){
+        if(reqb*burger<=nb && reqs*burger<=ns && reqc*burger<=nc){
+            already=burger;
         }
-    }
-    for(auto q : queries){
-        int op=q.first;
-        int x=q.second.first;
-        int y=q.second.second;
-        if(op==-1){
-            unify(x,y);
+    }    
+    nb-=already*reqb;
+    ns-=already*reqs;
+    nc-=already*reqc;
+    int lo=0,hi=1e12;
+    int answer=0;
+    while(lo<=hi){
+        int mid=(lo+hi)/2;
+        if(valid(mid)){
+            answer=max(answer,mid);
+            lo=mid+1;
         }
         else{
-            x=get(x);
-            y=get(y);
-            if(x==y){
-                answer.pb(1);
-            }
-            else{
-                answer.pb(0);
-            }
-        }      
-    }
-    reverse(all(answer));
-    for(auto x : answer){
-        if(x==1){
-            cout<<"YES"<<endl;
-        }
-        else{
-            cout<<"NO"<<endl;
+            hi=mid-1;
         }
     }
-    
+    cout<<answer+already<<endl;    
 }
-signed main() 
-{ 
+signed main()
+{
     FAST;
     solve();
     return 0; 

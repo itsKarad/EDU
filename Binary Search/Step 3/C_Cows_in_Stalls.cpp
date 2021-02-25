@@ -31,100 +31,43 @@ using namespace std;
 //===================================================================================================================
 // THE FIRST PRINCIPLE, IS THAT YOU MUST NOT FOOL YOURSELF, AND YOU ARE THE EASIEST PERSON TO FOOL- Richard Feynman.
 // ******************************************************************************************************************
-vector<set<int>> adj(50003);
-vector<int> p(200005,-1);
-vector<int> sz(200005,0);
-int get(int a){
-    if(p[a]!=a){
-        // path compression
-        p[a]=get(p[a]);
+int n,k;
+vector<int> a(1e4+5);
+bool valid(int x){
+    int curr=1;
+    int prev=a[0];
+    for(int i=1;i<n;i++){
+        if(a[i]-prev>=x){
+            prev=a[i];
+            curr++;
+        }
     }
-    
-    return p[a];
+    return (curr>=k);
 }
-void unify(int a,int b){
-    a=get(a);
-    b=get(b);
-    if(a==b){
-        return;
-    }
-    if(sz[a]<sz[b]){
-        swap(a,b);
-    }
-    p[b]=a;
-    sz[a]+=sz[b];
-}
-
 void solve()
 {
-    int n,m,k;
-    cin>>n>>m>>k;
-    for(int i=0;i<m;i++){
-        int x,y;
-        cin>>x>>y;
-        // connect these two
-        adj[x].insert(y);
-        adj[y].insert(x);
+    cin>>n>>k;    
+    for(int i=0;i<n;i++){
+        cin>>a[i];
     }
-    vector<int> answer;
-    vector<pair<int,pair<int,int>>> queries;
-    for(int i=0;i<k;i++){
-        string s;
-        cin>>s;
-        int x,y;
-        cin>>x>>y;
-        if(s=="ask"){
-            queries.pb({1,{x,y}});
+    int answer=0;
+    int lo=0,hi=a[n-1];
+    while(lo<=hi){
+        int mid=(lo+hi)/2;
+        if(valid(mid)){
+            answer=max(answer,mid);
+            lo=mid+1;
         }
         else{
-            adj[x].erase(y);
-            adj[y].erase(x);
-            queries.pb({-1,{x,y}});
+            hi=mid-1;
         }
     }
-    reverse(all(queries));
-    for(int i=1;i<=n;i++){
-        p[i]=i;
-        sz[i]=1;
-    }
-    for(int i=1;i<=n;i++){
-        for(auto j : adj[i]){
-            unify(i,j);
-        }
-    }
-    for(auto q : queries){
-        int op=q.first;
-        int x=q.second.first;
-        int y=q.second.second;
-        if(op==-1){
-            unify(x,y);
-        }
-        else{
-            x=get(x);
-            y=get(y);
-            if(x==y){
-                answer.pb(1);
-            }
-            else{
-                answer.pb(0);
-            }
-        }      
-    }
-    reverse(all(answer));
-    for(auto x : answer){
-        if(x==1){
-            cout<<"YES"<<endl;
-        }
-        else{
-            cout<<"NO"<<endl;
-        }
-    }
-    
+    cout<<answer<<endl;    
 }
 signed main() 
 { 
     FAST;
-    solve();
+        solve();
     return 0; 
 } 
 
